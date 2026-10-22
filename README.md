@@ -50,7 +50,7 @@ Beziehung: `Auftraege[Auftragsnr]` **1 → \*** `Terminaenderungen[Auftragsnr]`
 | **Details** | Auftragsebene mit Drill-through und farblicher Markierung (nicht informierte Kunden, große Verschiebungen) |
 
 ![Datenqualität](screenshots/01_datenqualitaet.png)
-![Überblick](screenshots/02_ueberblick.png)
+![Überblick](screenshots/02_ueberblick.png) 
 ![Ursachen](screenshots/03_ursachen.png)
 ![Details](screenshots/04_details.png)
 
