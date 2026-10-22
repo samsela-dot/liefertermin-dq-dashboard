@@ -49,10 +49,10 @@ Beziehung: `Auftraege[Auftragsnr]` **1 → \*** `Terminaenderungen[Auftragsnr]`
 | **Ursachen** | Änderungen nach Grund; Ø Verschiebung nach Markt; Änderungsquote nach Modell; Heatmap Markt × Grund |
 | **Details** | Auftragsebene mit Drill-through und farblicher Markierung (nicht informierte Kunden, große Verschiebungen) |
 
-![Datenqualität](screenshots/01_datenqualitaet.png)
-![Überblick](screenshots/02_ueberblick.png) 
-![Ursachen](screenshots/03_ursachen.png)
-![Details](screenshots/04_details.png)
+![Datenqualität](Liefertermin/screenshots/01_datenqualitaet.png)
+![Überblick](Liefertermin/screenshots/02_ueberblick.png) 
+![Ursachen](Liefertermin/screenshots/03_ursachen.png)
+![Details](Liefertermin/screenshots/04_details.png)
 
 ## Ausgewählte Erkenntnisse (fiktive Daten)
 
