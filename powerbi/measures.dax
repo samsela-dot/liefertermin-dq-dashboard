@@ -1,0 +1,101 @@
+// DAX – Measures und berechnete Spalten
+// Projekt: Liefertermin-Änderungen – Datenqualität & Dashboard (fiktive Daten)
+
+// ===== Berechnete Spalten (Terminaenderungen) =====
+
+// Ist_Dublette
+Ist_Dublette =
+VAR ID1 = Terminaenderungen[Aenderungs_ID]
+VAR idx = Terminaenderungen[Index]
+RETURN
+    IF (
+        COUNTROWS ( FILTER ( Terminaenderungen, Terminaenderungen[Aenderungs_ID] = ID1 && Terminaenderungen[Index] < idx ) ) > 0,
+        1, 0
+    )
+
+// Gueltig_final
+Gueltig_final =
+IF ( Terminaenderungen[Gueltig] = 1 && Terminaenderungen[Ist_Dublette] = 0, 1, 0 )
+
+// ===== Datenqualität =====
+
+// Tabelle: Terminaenderungen
+[Grund fehlt] =
+CALCULATE ( COUNTROWS ( Terminaenderungen ), Terminaenderungen[Grund_Error] = "Error" )
+
+// Tabelle: Terminaenderungen
+[Kunde ungültig] =
+CALCULATE ( COUNTROWS ( Terminaenderungen ), Terminaenderungen[Kunde_Informiert_Error] = "Error" )
+
+// Tabelle: Terminaenderungen
+[Verschiebung falsch] =
+CALCULATE ( COUNTROWS ( Terminaenderungen ), Terminaenderungen[Mathcheck_Error] = "Error" )
+
+// Tabelle: Terminaenderungen
+[Datum unplausibel] =
+CALCULATE ( COUNTROWS ( Terminaenderungen ), Terminaenderungen[Gueltig] = 0 )
+
+// Tabelle: Terminaenderungen
+[Dubletten] =
+SUM ( Terminaenderungen[Ist_Dublette] )
+
+// Tabelle: Auftraege
+[Markt ungültig] =
+CALCULATE ( COUNTROWS ( Auftraege ), Auftraege[Check_Markt_Error] = "error" )
+
+// Tabelle: Auftraege
+[Absatzmittler fehlt] =
+CALCULATE ( COUNTROWS ( Auftraege ), Auftraege[Missing Absatzmittler] = "Error" )
+
+// Tabelle: Terminaenderungen
+[Ausgeschlossene Änderungen] =
+CALCULATE ( COUNTROWS ( Terminaenderungen ), Terminaenderungen[Gueltig_final] = 0 )
+
+// Tabelle: Terminaenderungen
+[Datensätze gesamt] =
+FORMAT ( COUNTROWS ( Terminaenderungen ), "#,0" )
+
+// ===== KPIs =====
+
+// Tabelle: Auftraege
+[Anzahl Aufträge] =
+DISTINCTCOUNT ( Auftraege[Auftragsnr] )
+
+// Tabelle: Auftraege
+[Anzahl Aufträge (Karte)] =
+FORMAT ( DISTINCTCOUNT ( Auftraege[Auftragsnr] ), "#,0" )
+
+// Tabelle: Terminaenderungen
+[Anzahl Änderungen] =
+COUNTROWS ( Terminaenderungen )
+
+// Tabelle: Terminaenderungen
+[Änderungsquote] =
+DIVIDE ( DISTINCTCOUNT ( Terminaenderungen[Auftragsnr] ), [Anzahl Aufträge] )
+
+// Tabelle: Terminaenderungen
+[Ø Verschiebung(Tage)] =
+AVERAGE ( Terminaenderungen[Verschiebung_Tagen] )
+
+// Tabelle: Terminaenderungen
+[Kunde informiert %] =
+DIVIDE ( CALCULATE ( COUNTROWS ( Terminaenderungen ), Terminaenderungen[Kunde_informiert_clean] = "Ja" ), COUNTROWS ( Terminaenderungen ) )
+
+// Tabelle: Auftraege
+[Termintreue %] =
+VAR Geliefert = CALCULATE ( COUNTROWS ( Auftraege ), Auftraege[Status] = "Ausgeliefert" )
+VAR Puenktlich = CALCULATE ( COUNTROWS ( Auftraege ), Auftraege[Status] = "Ausgeliefert", ABS ( Auftraege[Abweichung_Tage] ) <= 2 )
+RETURN DIVIDE ( Puenktlich, Geliefert )
+
+// Tabelle: Auftraege
+[Ø Prognoseabweichung] =
+AVERAGEX (
+    FILTER ( Auftraege, NOT ISBLANK ( Auftraege[Abweichung_Tage] ) ),
+    ABS ( Auftraege[Abweichung_Tage] )
+)
+
+// ===== Formatierung =====
+
+// Tabelle: Terminaenderungen
+[Farbe Kunde] =
+SWITCH ( SELECTEDVALUE ( Terminaenderungen[Kunde_informiert_clean] ), "Nein", "#F4CCCC", "Unbekannt", "#FFF2CC", BLANK () )
